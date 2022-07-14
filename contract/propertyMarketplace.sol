@@ -5,15 +5,15 @@ pragma solidity >=0.7.0 <0.9.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract HouseToken is ERC20 {
-    constructor(string memory tokenName, string memory symbol, uint supply) ERC20(tokenName, symbol) {
-        _mint(msg.sender, 21 * supply ** decimals());
+    constructor(string memory tokenName, string memory symbol, uint supply, address owner) ERC20(tokenName, symbol) {
+        _mint(owner, supply * 10 ** decimals());
     }
 }
 
 
 interface IERC20Token {
   function transfer(address, uint256) external returns (bool);
-  function approve(address, uint256) external returns (bool);
+  function approxve(address, uint256) external returns (bool);
   function transferFrom(address, address, uint256) external returns (bool);
   function totalSupply() external view returns (uint256);
   function balanceOf(address) external view returns (uint256);
@@ -35,6 +35,7 @@ contract PropertyMarketplace {
         uint bedrooms;
         uint bathrooms;
         Status status;
+        HouseToken houseToken;
     }
 
     struct PropertyLabel{
@@ -67,17 +68,22 @@ contract PropertyMarketplace {
         uint _sold = 0;
         _stockData.sold = _sold;
         
+        HouseToken _houseToken = new HouseToken(_label.name, "HTK", _stockData.numShares, address(this));
+
+        //give approval to the smart contract to transfer tokens from the owner to buyers
+        // _houseToken.approve(address(this), _stockData.numShares);
+
         properties[propertiesLength] = Property(
             payable(msg.sender),
             _label,
             _stockData,
             _bedrooms,
             _bathrooms,
-            Status.OnSale
+            Status.OnSale,
+            _houseToken
         );
         propertiesLength++;
         
-        HouseToken propertyToken = new HouseToken(_label.name, "HTK", _stockData.numShares);
 
     }
 
@@ -87,7 +93,8 @@ contract PropertyMarketplace {
         PropertyStockData memory,
         uint, 
         uint, 
-        Status
+        Status,
+        HouseToken
     ) {
         return (
             properties[_index].owner,
@@ -95,16 +102,43 @@ contract PropertyMarketplace {
             properties[_index].stockData,
             properties[_index].bedrooms,
             properties[_index].bathrooms,
-            properties[_index].status
-
+            properties[_index].status,
+            properties[_index].houseToken
         );
     }
+
+    function getAllowance(address spender, uint _index)
+    public
+    view
+    returns (uint){
+        return properties[_index].houseToken.allowance(properties[_index].owner, spender);
+    }
+
+    function getTokenAddress(uint index)
+    public
+    view
+    returns(address){
+        return address(properties[index].houseToken);
+    }
+
+    function getBalance(uint index,address owner)
+    public
+    view
+    returns(uint){
+        return properties[index].houseToken.balanceOf(owner);
+    }
+    function approveSpender(address spender, uint index) public {
+        properties[index].houseToken.approve(spender, 10);
+
+    }
+
 
     function updatePropertyPrice(uint _index, uint _price)
     public
     {
         require(msg.sender==properties[_index].owner, "Only the property owner can cancel the sale");
         require(properties[_index].stockData.sold==0, "The sale cannot be updated if some tokens are already issued");
+        require(propeties[_index].status!=Status.SaleCancelled, "The property sale is cancelled");
         properties[_index].stockData.price = _price;
     }
 
@@ -124,7 +158,7 @@ contract PropertyMarketplace {
         );
         
         require(
-            properties[_index].stockData.sold<properties[_index].stockData.numShares-1 ||
+            properties[_index].stockData.sold<properties[_index].stockData.numShares ||
             properties[_index].status!=Status.SoldOut
         , "All shares of this property is sold out."
         );
@@ -139,13 +173,13 @@ contract PropertyMarketplace {
         );
 
         properties[_index].stockData.sold++;
-        if(properties[_index].stockData.sold==properties[_index].stockData.numShares-1){
+        if(properties[_index].stockData.sold==properties[_index].stockData.numShares){
             properties[_index].status = Status.SoldOut;
         }
 
-        /** TODO
-        - transfer property token to buyer
-        - make sure that there are property tokens left */
+        /*
+        - transfer property token to buyer*/
+        properties[_index].houseToken.transfer(msg.sender,1);
     }
     
     function getpropertiesLength() public view returns (uint) {
