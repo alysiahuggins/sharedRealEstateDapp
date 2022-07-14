@@ -2,6 +2,15 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract HouseToken is ERC20 {
+    constructor(string memory tokenName, string memory symbol, uint supply) ERC20(tokenName, symbol) {
+        _mint(msg.sender, 21 * supply ** decimals());
+    }
+}
+
+
 interface IERC20Token {
   function transfer(address, uint256) external returns (bool);
   function approve(address, uint256) external returns (bool);
@@ -21,16 +30,24 @@ contract PropertyMarketplace {
 
     struct Property {
         address payable owner;
+        PropertyLabel label;
+        PropertyStockData stockData;
+        uint bedrooms;
+        uint bathrooms;
+        Status status;
+    }
+
+    struct PropertyLabel{
         string name;
         string image;
         string description;
         string location;
+    }
+
+    struct PropertyStockData{
         uint price;
         uint sold;
         uint numShares;
-        uint bedrooms;
-        uint bathrooms;
-        Status status;
     }
 
     enum Status {
@@ -42,55 +59,40 @@ contract PropertyMarketplace {
     mapping (uint => Property) internal properties;
 
     function writeProperty(
-        string memory _name,
-        string memory _image,
-        string memory _description, 
-        string memory _location, 
-        uint _price,
-        uint _numShares,
+        PropertyLabel memory _label, 
+        PropertyStockData memory _stockData,
         uint _bedrooms,
         uint _bathrooms
     ) public {
         uint _sold = 0;
+        _stockData.sold = _sold;
         
         properties[propertiesLength] = Property(
             payable(msg.sender),
-            _name,
-            _image,
-            _description,
-            _location,
-            _price,
-            _sold,
-            _numShares,
+            _label,
+            _stockData,
             _bedrooms,
             _bathrooms,
             Status.OnSale
         );
         propertiesLength++;
+        
+        HouseToken propertyToken = new HouseToken(_label.name, "HTK", _stockData.numShares);
+
     }
 
     function readProperty(uint _index) public view returns (
         address payable,
-        string memory, 
-        string memory, 
-        string memory, 
-        string memory, 
-        uint, 
-        uint,
-        uint, 
+        PropertyLabel memory,
+        PropertyStockData memory,
         uint, 
         uint, 
         Status
     ) {
         return (
             properties[_index].owner,
-            properties[_index].name, 
-            properties[_index].image, 
-            properties[_index].description, 
-            properties[_index].location, 
-            properties[_index].price,
-            properties[_index].sold,
-            properties[_index].numShares,
+            properties[_index].label, 
+            properties[_index].stockData,
             properties[_index].bedrooms,
             properties[_index].bathrooms,
             properties[_index].status
@@ -102,47 +104,48 @@ contract PropertyMarketplace {
     public
     {
         require(msg.sender==properties[_index].owner, "Only the property owner can cancel the sale");
-        require(properties[_index].sold==0, "The sale cannot be updated if some tokens are already issued");
-        properties[_index].price = _price;
+        require(properties[_index].stockData.sold==0, "The sale cannot be updated if some tokens are already issued");
+        properties[_index].stockData.price = _price;
     }
 
     function cancelPropertySale(uint _index)
     public
     {
         require(msg.sender==properties[_index].owner, "Only the property owner can cancel the sale");
-        require(properties[_index].sold==0, "The sale cannot be cancelled if some tokens are already issued");
+        require(properties[_index].stockData.sold==0, "The sale cannot be cancelled if some tokens are already issued");
         properties[_index].status = Status.SaleCancelled;
     }
     
     function buyProperty(uint _index) public payable  {
          require(
-            properties[_index].status!=Status.Cancelled
+            properties[_index].status!=Status.SaleCancelled
           ,
           "This property sale is cancelled."
         );
         
         require(
-            properties[_index].sold<properties[_index].numShares-1 ||
-            properties[_index].status!=Status.SoldOut ||
+            properties[_index].stockData.sold<properties[_index].stockData.numShares-1 ||
+            properties[_index].status!=Status.SoldOut
         , "All shares of this property is sold out."
-        )
+        );
 
         require(
           IERC20Token(cUsdTokenAddress).transferFrom(
             msg.sender,
             properties[_index].owner,
-            properties[_index].price
+            properties[_index].stockData.price
           ),
           "Transfer failed."
         );
 
-        properties[_index].sold++;
-        if(properties[_index].sold==properties[_index].numShares-1){
-            properties[_index].status = Status.SoldOut
+        properties[_index].stockData.sold++;
+        if(properties[_index].stockData.sold==properties[_index].stockData.numShares-1){
+            properties[_index].status = Status.SoldOut;
         }
 
         /** TODO
-        - transfer property token to buyer */
+        - transfer property token to buyer
+        - make sure that there are property tokens left */
     }
     
     function getpropertiesLength() public view returns (uint) {
