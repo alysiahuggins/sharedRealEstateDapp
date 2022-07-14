@@ -70,9 +70,6 @@ contract PropertyMarketplace {
         
         HouseToken _houseToken = new HouseToken(_label.name, "HTK", _stockData.numShares, address(this));
 
-        //give approval to the smart contract to transfer tokens from the owner to buyers
-        // _houseToken.approve(address(this), _stockData.numShares);
-
         properties[propertiesLength] = Property(
             payable(msg.sender),
             _label,
@@ -129,16 +126,46 @@ contract PropertyMarketplace {
     }
     function approveSpender(address spender, uint index) public {
         properties[index].houseToken.approve(spender, 10);
+    }
+
+    function getPropertyPricePerToken(uint _index)
+    public
+    view
+    returns(uint){
+        return properties[_index].stockData.price/properties[_index].stockData.numShares;
 
     }
 
+    function getPropertyPrice(uint _index)
+    public
+    view
+    returns(uint){
+        return properties[_index].stockData.price;
+
+    }
+
+    function getPropertyTotalTokens(uint _index)
+    public
+    view
+    returns(uint){
+        return properties[_index].stockData.numShares;
+
+    }
+
+    function getPropertyTokensRemaining(uint _index)
+    public
+    view
+    returns(uint){
+        return properties[_index].stockData.numShares - properties[_index].stockData.sold;
+
+    }
 
     function updatePropertyPrice(uint _index, uint _price)
     public
     {
         require(msg.sender==properties[_index].owner, "Only the property owner can cancel the sale");
         require(properties[_index].stockData.sold==0, "The sale cannot be updated if some tokens are already issued");
-        require(propeties[_index].status!=Status.SaleCancelled, "The property sale is cancelled");
+        require(properties[_index].status!=Status.SaleCancelled, "The property sale is cancelled");
         properties[_index].stockData.price = _price;
     }
 
@@ -156,31 +183,37 @@ contract PropertyMarketplace {
           ,
           "This property sale is cancelled."
         );
-        
+
+        //check if the property is already sold out
         require(
             properties[_index].stockData.sold<properties[_index].stockData.numShares ||
             properties[_index].status!=Status.SoldOut
         , "All shares of this property is sold out."
         );
 
+        //transfer tokens from buyer to seller
         require(
           IERC20Token(cUsdTokenAddress).transferFrom(
             msg.sender,
             properties[_index].owner,
-            properties[_index].stockData.price
+            properties[_index].stockData.price/properties[_index].stockData.numShares
           ),
-          "Transfer failed."
+          "Transfer of assets from buyer to seller failed."
         );
+
+        
+
+        /*
+        - transfer property token to buyer*/
+        require(properties[_index].houseToken.transfer(msg.sender,1), 
+        "Transfer of hosue tokens from app to buyer failed");
 
         properties[_index].stockData.sold++;
         if(properties[_index].stockData.sold==properties[_index].stockData.numShares){
             properties[_index].status = Status.SoldOut;
         }
-
-        /*
-        - transfer property token to buyer*/
-        properties[_index].houseToken.transfer(msg.sender,1);
     }
+
     
     function getpropertiesLength() public view returns (uint) {
         return (propertiesLength);
