@@ -13,9 +13,52 @@ const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 let contract
 let erc20Contract
 let products = []
+let _properties = []
+let properties = []
 let web3 
 let defaultAccount
 let celoTestnetChainId=44787
+
+let properties1 = [
+  {
+    owner: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
+    name: "Best House",
+    image: "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg",
+    description: `Best house on the block`,
+    location: "London, UK",
+    price: 3000000,
+    numShares: 10,
+    bedrooms: 4,
+    bathrooms: 4,
+    sold: 0,
+    index: 0,
+  },
+]
+let _properties2 = [
+  {
+    owner: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
+    label: ["Best House",
+    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg",
+    `Best house on the block`, "London, UK"],
+    stockData: [3000000,0,10],
+    bedrooms: 4,
+    bathrooms: 4,
+    houseToken: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
+    index: 0,
+  },
+]
+
+_properties = [[
+  "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
+    ["Best House",
+    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg",
+    `Best house on the block`, "London, UK"],
+   [3000000,0,10],
+   4,
+     4,
+    "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
+    0
+]]
 
 ethereum.on('chainChanged', (_chainId) => window.location.reload());
 
@@ -98,57 +141,91 @@ const connectCeloWallet = async function () {
       products = await Promise.all(_products)
       renderProducts()
     }
+
+    const getProperties2 =  async function() {
+      // const _productsLength = await contract.methods.getPropertiesLength().call()
+      const _propertiesLength = _properties.length
+      // const _products = []
+      for (let i = 0; i < _propertiesLength; i++) {
+          // let _properties = new Promise(async (resolve, reject) => {
+            // let p = await contract.methods.readProperty(i).call()
+            let p = _properties[i]
+            let owner = p[0]
+            let name = p.label[0]
+            let image = p.label[1]
+            let description = p.label[2]
+            let location = p.label[3]
+            let price = p.stockData[0]
+            let sold = p.stockData[1]
+            let numShares = p.stockData[2]
+
+            let _property = {
+              index: i,
+              owner: p[0],
+              name: name,
+              image: image,
+              description: description,
+              location: location,
+              price: price,
+              sold: sold,
+              numShares: numShares,
+              bedrooms: p.bedrooms,
+              bathrooms: p[4],
+              status: p[5],
+              houseTokenAddress: p[6],
+            }
+          // })
+           properties.push(_property)
+        }
+        // products = await Promise.all(_products)
+        renderProperties()
+      }
+
+      const getProperties =  async function() {
+        // const _productsLength = await contract.methods.getPropertiesLength().call()
+        const _propertiesLength = _properties.length
+        // const _products = []
+        for (let i = 0; i < _propertiesLength; i++) {
+            // let _properties = new Promise(async (resolve, reject) => {
+              // let p = await contract.methods.readProperty(i).call()
+              let p = _properties[i]
+              let owner = p[0]
+              let name = p[1][0]
+              let image = p[1][1]
+              let description = p[1][2]
+              let location = p[1][3]
+              let price = p[2][0]
+              let sold = p[2][1]
+              let numShares = p[2][2]
   
-// const products = [
-//     {
-//       name: "Giant BBQ",
-//       image: "https://i.imgur.com/yPreV19.png",
-//       description: `Grilled chicken, beef, fish, sausages, bacon, 
-//         vegetables served with chips.`,
-//       location: "Kimironko Market",
-//       owner: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-//       price: 3,
-//       sold: 27,
-//       index: 0,
-//     },
-//     {
-//       name: "BBQ Chicken",
-//       image: "https://i.imgur.com/NMEzoYb.png",
-//       description: `French fries and grilled chicken served with gacumbari 
-//         and avocados with cheese.`,
-//       location: "Afrika Fresh KG 541 St",
-//       owner: "0x3275B7F400cCdeBeDaf0D8A9a7C8C1aBE2d747Ea",
-//       price: 4,
-//       sold: 12,
-//       index: 1,
-//     },
-//     {
-//       name: "Beef burrito",
-//       image: "https://i.imgur.com/RNlv3S6.png",
-//       description: `Homemade tortilla with your choice of filling, cheese, 
-//         guacamole salsa with Mexican refried beans and rice.`,
-//       location: "Asili - KN 4 St",
-//       owner: "0x2EF48F32eB0AEB90778A2170a0558A941b72BFFb",
-//       price: 2,
-//       sold: 35,
-//       index: 2,
-//     },
-//     {
-//       name: "Barbecue Pizza",
-//       image: "https://i.imgur.com/fpiDeFd.png",
-//       description: `Barbecue Chicken Pizza: Chicken, gouda, pineapple, onions 
-//         and house-made BBQ sauce.`,
-//       location: "Kigali Hut KG 7 Ave",
-//       owner: "0x2EF48F32eB0AEB90778A2170a0558A941b72BFFb",
-//       price: 1,
-//       sold: 2,
-//       index: 3,
-//     },
-//   ]
+              let _property = {
+                index: i,
+                owner: p[0],
+                name: name,
+                image: image,
+                description: description,
+                location: location,
+                price: price,
+                sold: sold,
+                numShares: numShares,
+                bedrooms: p[3],
+                bathrooms: p[4],
+                status: p[5],
+                houseTokenAddress: p[6],
+              }
+            // })
+             properties.push(_property)
+          }
+          // products = await Promise.all(_products)
+          renderProperties()
+        }
+
 
 //   const getBalance = function () {
 //     document.querySelector("#balance").textContent = 21
 //   }
+
+
 
   function renderProducts() {
     document.getElementById("marketplace").innerHTML = ""
@@ -161,6 +238,141 @@ const connectCeloWallet = async function () {
   }
 
   function productTemplate(_product) {
+    let viewerIsOwner = true
+    if (viewerIsOwner){
+      return `
+      <div class="card mb-4">
+        <img class="card-img-top" src="${_product.image}" alt="...">
+        <div class="position-absolute top-0 end-0 bg-warning mt-4 px-2 py-1 rounded-start">
+          ${_product.sold} Sold
+        </div>
+        <div class="card-body text-left p-4 position-relative">
+        <div class="translate-middle-y position-absolute top-0">
+        ${identiconTemplate(_product.owner)}
+        </div>
+        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
+        <p class="card-text mb-4" style="min-height: 82px">
+          ${_product.description}             
+        </p>
+        <p class="card-text mt-4">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>${_product.location}</span>
+        </p>
+        <div class="d-grid gap-2">
+          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
+          </a>
+          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Update Price
+          </a>
+          <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Cancel Sale
+          </a>
+        </div>
+      </div>
+    </div>`
+    }
+    
+    return `
+      <div class="card mb-4">
+        <img class="card-img-top" src="${_product.image}" alt="...">
+        <div class="position-absolute top-0 end-0 bg-warning mt-4 px-2 py-1 rounded-start">
+          ${_product.sold} Sold
+        </div>
+        <div class="card-body text-left p-4 position-relative">
+        <div class="translate-middle-y position-absolute top-0">
+        ${identiconTemplate(_product.owner)}
+        </div>
+        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
+        <p class="card-text mb-4" style="min-height: 82px">
+          ${_product.description}             
+        </p>
+        <p class="card-text mt-4">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>${_product.location}</span>
+        </p>
+        <div class="d-grid gap-2">
+          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
+          </a>
+        </div>
+      </div>
+    </div>
+  `
+}
+
+  function renderProperties() {
+    document.getElementById("marketplace").innerHTML = ""
+    properties.forEach((_property) => {
+      const newDiv = document.createElement("div")
+      newDiv.className = "col-md-4"
+      newDiv.innerHTML = propertiesTemplate(_property)
+      document.getElementById("marketplace").appendChild(newDiv)
+    })
+  }
+
+
+  function propertiesTemplate(_product) {
+    let viewerIsOwner = true
+    if (viewerIsOwner){
+      return `
+      <div class="card mb-4">
+        <img class="card-img-top" src="${_product.image}" alt="...">
+        <div class="position-absolute top-0 end-0 bg-warning mt-1 px-2 py-1 rounded-start">
+          ${_product.sold} Sold
+        </div>
+        <div class="position-absolute top-0 end-0 bg-warning mt-5 px-2 py-1 rounded-start">
+          ${_product.numShares} Shares
+        </div>
+        <div class="card-body text-left p-4 position-relative">
+        <div class="translate-middle-y position-absolute top-0">
+        ${identiconTemplate(_product.owner)}
+        </div>
+        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
+        <p class="card-text mb-4" style="min-height: 82px">
+          ${_product.description}             
+        </p>
+        <p class="card-text mt-4">
+          <i class="bi bi-door-open"></i>
+          <span>${_product.bedrooms} Bedrooms</span>
+        </p>
+        <p class="card-text mt-4">
+          <i class="bi bi-door-closed"></i>
+          <span>${_product.bathrooms} Bathrooms</span>
+        </p>
+        <p class="card-text mt-4">
+          <i class="bi bi-geo-alt-fill"></i>
+          <span>${_product.location}</span>
+        </p>
+        <div class="d-grid gap-2">
+          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
+          </a>
+          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Update Price
+          </a>
+          <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3" id=${
+            _product.index
+          }>
+            Cancel Sale
+          </a>
+        </div>
+      </div>
+    </div>`
+    }
+    
     return `
       <div class="card mb-4">
         <img class="card-img-top" src="${_product.image}" alt="...">
@@ -224,7 +436,8 @@ function identiconTemplate(_address) {
     // await connectCeloWallet()
     await connectMetamaskWallet()
     await getBalance()
-    await getProducts()
+    // await getProducts()
+    await getProperties()
     notificationOff()
   });
 

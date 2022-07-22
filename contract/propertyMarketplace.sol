@@ -104,6 +104,12 @@ contract PropertyMarketplace {
         );
     }
 
+    function getPropertiesLength()
+    public
+    view
+    returns (uint){
+        return propertiesLength;
+    }
     function getAllowance(address spender, uint _index)
     public
     view

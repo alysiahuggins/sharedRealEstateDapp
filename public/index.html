@@ -40,7 +40,7 @@
         }
       </style>
   
-      <title>Street Food Kigali</title>
+      <title>Shared Real Estate</title>
       </head>
 
       <body>
@@ -48,7 +48,7 @@
     
           <nav class="navbar bg-white navbar-light">
             <div class="container-fluid">
-              <span class="navbar-brand m-0 h4 fw-bold">Street Food Kigali</span>
+              <span class="navbar-brand m-0 h4 fw-bold">Shared Real Estate</span>
               <span class="nav-link border rounded-pill bg-light">
                 <span id="balance">0</span>
                 cUSD
@@ -64,7 +64,7 @@
               data-bs-toggle="modal"
               data-bs-target="#addModal"
             >
-              Add product
+              Add property
             </a>
           </div>
           <main id="marketplace" class="row"></main>
@@ -81,7 +81,7 @@
         <div class="modal-content">
 
             <div class="modal-header">
-            <h5 class="modal-title" id="newProductModalLabel">New Product</h5>
+            <h5 class="modal-title" id="newProductModalLabel">New Property</h5>
             <button
                 type="button"
                 class="btn-close"
@@ -97,7 +97,7 @@
                         type="text"
                         id="newProductName"
                         class="form-control mb-2"
-                        placeholder="Enter name of product"
+                        placeholder="Enter name of property"
                       />
                     </div>
                     <div class="col">
@@ -113,7 +113,7 @@
                         type="text"
                         id="newProductDescription"
                         class="form-control mb-2"
-                        placeholder="Enter product description"
+                        placeholder="Enter property description"
                       />
                     </div>
                     <div class="col">
@@ -124,12 +124,37 @@
                         placeholder="Enter location"
                       />
                     </div>
+                    
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="numBedrooms"
+                        class="form-control mb-2"
+                        placeholder="Enter number of bedrooms"
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="numBathrooms"
+                        class="form-control mb-2"
+                        placeholder="Enter number of bedrooms"
+                      />
+                    </div>
                     <div class="col">
                       <input
                         type="text"
                         id="newPrice"
                         class="form-control mb-2"
-                        placeholder="Enter price"
+                        placeholder="Enter property price"
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="numShares"
+                        class="form-control mb-2"
+                        placeholder="Enter max number of house token owners"
                       />
                     </div>
                   </div>
@@ -149,7 +174,7 @@
                   data-bs-dismiss="modal"
                   id="newProductBtn"
                 >
-                  Add product
+                  Add property
                 </button>
               </div>
             </div>
