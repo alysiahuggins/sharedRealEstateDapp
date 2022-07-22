@@ -316,28 +316,44 @@ function identiconTemplate(_address) {
 
   async function approve(_price) {
     const cUSDContract = new web3.eth.Contract(erc20Abi, cUSDTokenAddress)
+    console.log("toApprove")
   
     const result = await cUSDContract.methods
       .approve(MPContractAddress, _price)
       .send({ from: defaultAccount })
+      console.log(result)
     return result
   }
 
   document.querySelector("#marketplace").addEventListener("click", async (e) => {
     if (e.target.className.includes("buyBtn")) {
       const index = e.target.id
-      notification("⌛ Waiting for payment approval...")
-      try {
-        await approve(products[index].price)
+      try{
+        let walletBalance = await getBalance()
+        console.log(walletBalance)
+        if (walletBalance<properties[index].price/properties[index].numShares){
+          notification(`You do not have enough cUSD to buy this propertyShare.`)
+          return
+        }
       } catch (error) {
         notification(`⚠️ ${error}.`)
       }
-      notification(`⌛ Awaiting payment for "${products[index].name}"...`)
+      
+
+
+      notification("⌛ Waiting for payment approval...")
+      try {
+        await approve(properties[index].price)
+      
+      } catch (error) {
+        notification(`⚠️ ${error}.`)
+      }
+      notification(`⌛ Awaiting payment for "${properties[index].name}"...`)
     try {
       const result = await contract.methods
-        .buyProduct(index)
+        .buyProperty(index)
         .send({ from: defaultAccount })
-      notification(`🎉 You successfully bought "${products[index].name}".`)
+      notification(`🎉 You successfully bought "${properties[index].name}".`)
       getProperties()
       getBalance()
     } catch (error) {
