@@ -8,7 +8,7 @@ import erc20Abi from '../contract/erc20.abi.json'
 const ERC20_DECIMALS = 18
 
 let kit
-const MPContractAddress = "0xcaebdebB4D9094729362638931d7C9dB10B4a059"//"0x769039929b2D060588eA5A05e1c2065D4a2d888d"
+const MPContractAddress = "0x3E9B8e9a28Af97e5B468131b2484C4156C693709"//"0xcaebdebB4D9094729362638931d7C9dB10B4a059"//"0x769039929b2D060588eA5A05e1c2065D4a2d888d"
 const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 let contract
 let erc20Contract
@@ -19,6 +19,9 @@ let web3
 let defaultAccount
 let celoTestnetChainId=44787
 
+
+// ["Best House","https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg","Best house on the block","London, UK"]
+// [300000000000000000000000,0,10]
 
 
 ethereum.on('chainChanged', (_chainId) => window.location.reload());

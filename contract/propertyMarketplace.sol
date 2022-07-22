@@ -13,7 +13,7 @@ contract HouseToken is ERC20 {
 
 interface IERC20Token {
   function transfer(address, uint256) external returns (bool);
-  function approxve(address, uint256) external returns (bool);
+  function approve(address, uint256) external returns (bool);
   function transferFrom(address, address, uint256) external returns (bool);
   function totalSupply() external view returns (uint256);
   function balanceOf(address) external view returns (uint256);
@@ -110,6 +110,7 @@ contract PropertyMarketplace {
     returns (uint){
         return propertiesLength;
     }
+    
     function getAllowance(address spender, uint _index)
     public
     view
@@ -211,7 +212,7 @@ contract PropertyMarketplace {
 
         /*
         - transfer property token to buyer*/
-        require(properties[_index].houseToken.transfer(msg.sender,1), 
+        require(properties[_index].houseToken.transfer(msg.sender,1 ether), 
         "Transfer of hosue tokens from app to buyer failed");
 
         properties[_index].stockData.sold++;
@@ -221,7 +222,4 @@ contract PropertyMarketplace {
     }
 
     
-    function getpropertiesLength() public view returns (uint) {
-        return (propertiesLength);
-    }
 }
