@@ -20,6 +20,7 @@ let defaultAccount
 let celoTestnetChainId=44787
 
 
+
 // ["Best House","https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg","Best house on the block","London, UK"]
 // [300000000000000000000000,0,10]
 
@@ -172,6 +173,10 @@ const connectCeloWallet = async function () {
         <p class="card-text mt-4">
           <i class="bi bi-geo-alt-fill"></i>
           <span>${_product.location}</span>
+        </p>
+        <p class="card-text mt-4 ">
+          <i class="bi bi-megaphone-fill" ></i>
+          <span>${_product.status==0?'On Sale':_product.status==1?'Sale Cancelled':'Sold Out'}</span>
         </p>
         <div class="d-grid gap-2">
           <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" style="${_product.status!=0?'display:none':'display:block'}" id=${
