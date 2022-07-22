@@ -1,64 +1,24 @@
 import Web3 from 'web3'
 // import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from "bignumber.js"
-import marketplaceAbi from '../contract/marketplace.abi.json'
+import marketplaceAbi from '../contract/propertyMarketplace.abi.json'
 import erc20Abi from '../contract/erc20.abi.json'
 
 
 const ERC20_DECIMALS = 18
 
 let kit
-const MPContractAddress = "0x769039929b2D060588eA5A05e1c2065D4a2d888d"
+const MPContractAddress = "0xcaebdebB4D9094729362638931d7C9dB10B4a059"//"0x769039929b2D060588eA5A05e1c2065D4a2d888d"
 const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 let contract
 let erc20Contract
 let products = []
-let _properties = []
 let properties = []
 let web3 
 let defaultAccount
 let celoTestnetChainId=44787
 
-let properties1 = [
-  {
-    owner: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-    name: "Best House",
-    image: "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg",
-    description: `Best house on the block`,
-    location: "London, UK",
-    price: 3000000,
-    numShares: 10,
-    bedrooms: 4,
-    bathrooms: 4,
-    sold: 0,
-    index: 0,
-  },
-]
-let _properties2 = [
-  {
-    owner: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-    label: ["Best House",
-    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg",
-    `Best house on the block`, "London, UK"],
-    stockData: [3000000,0,10],
-    bedrooms: 4,
-    bathrooms: 4,
-    houseToken: "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-    index: 0,
-  },
-]
 
-_properties = [[
-  "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-    ["Best House",
-    "https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg",
-    `Best house on the block`, "London, UK"],
-   [3000000,0,10],
-   4,
-     4,
-    "0x32Be343B94f860124dC4fEe278FDCBD38C102D88",
-    0
-]]
 
 ethereum.on('chainChanged', (_chainId) => window.location.reload());
 
@@ -142,24 +102,21 @@ const connectCeloWallet = async function () {
       renderProducts()
     }
 
-    const getProperties2 =  async function() {
-      // const _productsLength = await contract.methods.getPropertiesLength().call()
-      const _propertiesLength = _properties.length
-      // const _products = []
-      for (let i = 0; i < _propertiesLength; i++) {
-          // let _properties = new Promise(async (resolve, reject) => {
-            // let p = await contract.methods.readProperty(i).call()
-            let p = _properties[i]
-            let owner = p[0]
-            let name = p.label[0]
-            let image = p.label[1]
-            let description = p.label[2]
-            let location = p.label[3]
-            let price = p.stockData[0]
-            let sold = p.stockData[1]
-            let numShares = p.stockData[2]
 
-            let _property = {
+    const getProperties =  async function() {
+      const _propertiesLength = await contract.methods.getPropertiesLength().call()
+      const _properties = []
+      for (let i = 0; i < _propertiesLength; i++) {
+          let _property = new Promise(async (resolve, reject) => {
+            let p = await contract.methods.readProperty(i).call()
+            let name = p[1][0]
+            let image = p[1][1]
+            let description = p[1][2]
+            let location = p[1][3]
+            let price = p[2][0]
+            let sold = p[2][1]
+            let numShares = p[2][2]
+            resolve({
               index: i,
               owner: p[0],
               name: name,
@@ -169,57 +126,17 @@ const connectCeloWallet = async function () {
               price: price,
               sold: sold,
               numShares: numShares,
-              bedrooms: p.bedrooms,
+              bedrooms: p[3],
               bathrooms: p[4],
               status: p[5],
               houseTokenAddress: p[6],
-            }
-          // })
-           properties.push(_property)
+            })
+            })
+            _properties.push(_property)
         }
-        // products = await Promise.all(_products)
+        properties = await Promise.all(_properties)
         renderProperties()
       }
-
-      const getProperties =  async function() {
-        // const _productsLength = await contract.methods.getPropertiesLength().call()
-        const _propertiesLength = _properties.length
-        // const _products = []
-        for (let i = 0; i < _propertiesLength; i++) {
-            // let _properties = new Promise(async (resolve, reject) => {
-              // let p = await contract.methods.readProperty(i).call()
-              let p = _properties[i]
-              let owner = p[0]
-              let name = p[1][0]
-              let image = p[1][1]
-              let description = p[1][2]
-              let location = p[1][3]
-              let price = p[2][0]
-              let sold = p[2][1]
-              let numShares = p[2][2]
-  
-              let _property = {
-                index: i,
-                owner: p[0],
-                name: name,
-                image: image,
-                description: description,
-                location: location,
-                price: price,
-                sold: sold,
-                numShares: numShares,
-                bedrooms: p[3],
-                bathrooms: p[4],
-                status: p[5],
-                houseTokenAddress: p[6],
-              }
-            // })
-             properties.push(_property)
-          }
-          // products = await Promise.all(_products)
-          renderProperties()
-        }
-
 
 //   const getBalance = function () {
 //     document.querySelector("#balance").textContent = 21
@@ -465,6 +382,9 @@ function identiconTemplate(_address) {
       getProducts()
     })
 
+
+    
+
  
   
 
@@ -492,7 +412,8 @@ function identiconTemplate(_address) {
         .buyProduct(index)
         .send({ from: defaultAccount })
       notification(`🎉 You successfully bought "${products[index].name}".`)
-      getProducts()
+      // getProducts()
+      getProperties()
       getBalance()
     } catch (error) {
       notification(`⚠️ ${error}.`)
