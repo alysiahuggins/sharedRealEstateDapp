@@ -79,29 +79,7 @@ const connectCeloWallet = async function () {
     document.querySelector("#balance").textContent = parseFloat(web3.utils.fromWei(cUSDBalance, 'ether')).toFixed(2)
   }
 
-  const getProducts = async function() {
-    const _productsLength = await contract.methods.getProductsLength().call()
-    const _products = []
-    for (let i = 0; i < _productsLength; i++) {
-        let _product = new Promise(async (resolve, reject) => {
-          let p = await contract.methods.readProduct(i).call()
-          resolve({
-            index: i,
-            owner: p[0],
-            name: p[1],
-            image: p[2],
-            description: p[3],
-            location: p[4],
-            price: new BigNumber(p[5]),
-            sold: p[6],
-          })
-        })
-        _products.push(_product)
-      }
-      products = await Promise.all(_products)
-      renderProducts()
-    }
-
+  
 
     const getProperties =  async function() {
       const _propertiesLength = await contract.methods.getPropertiesLength().call()
@@ -353,33 +331,40 @@ function identiconTemplate(_address) {
     // await connectCeloWallet()
     await connectMetamaskWallet()
     await getBalance()
-    // await getProducts()
     await getProperties()
     notificationOff()
   });
 
   //adding the product
   document
-  .querySelector("#newProductBtn")
+  .querySelector("#newPropertyBtn")
   .addEventListener("click", async (e) => {
     const params = [
-      document.getElementById("newProductName").value,
-      document.getElementById("newImgUrl").value,
-      document.getElementById("newProductDescription").value,
-      document.getElementById("newLocation").value,
-      web3.utils.toWei(document.getElementById("newPrice").value)
+      [
+        document.getElementById("newPropertyName").value,
+        document.getElementById("newImgUrl").value,
+        document.getElementById("newPropertyDescription").value,
+        document.getElementById("newLocation").value
+      ],
+      [
+        web3.utils.toWei(document.getElementById("newPrice").value),
+        0,
+        document.getElementById("numShares").value
+      ],
+      document.getElementById("numBedrooms").value,
+      document.getElementById("numBathrooms").value
     ]
     notification(`⌛ Adding "${params[0]}"...`)
     try {
         const result = await contract.methods
-          .writeProduct(...params)
+          .writeProperty(...params)
           .send({ from: defaultAccount })
           console.log(result)
       } catch (error) {
         notification(`⚠️ ${error}.`)
       }
       notification(`🎉 You successfully added "${params[0]}".`)
-      getProducts()
+      await getProperties()
     })
 
 
@@ -412,7 +397,6 @@ function identiconTemplate(_address) {
         .buyProduct(index)
         .send({ from: defaultAccount })
       notification(`🎉 You successfully bought "${products[index].name}".`)
-      // getProducts()
       getProperties()
       getBalance()
     } catch (error) {
