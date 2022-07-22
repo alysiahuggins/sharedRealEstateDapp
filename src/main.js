@@ -8,7 +8,7 @@ import erc20Abi from '../contract/erc20.abi.json'
 const ERC20_DECIMALS = 18
 
 let kit
-const MPContractAddress = "0x3E9B8e9a28Af97e5B468131b2484C4156C693709"//"0xcaebdebB4D9094729362638931d7C9dB10B4a059"//"0x769039929b2D060588eA5A05e1c2065D4a2d888d"
+const MPContractAddress = "0xB73B63278fdbaB9a12Aa10C9791Bed0C8edb50CD"//"0x3E9B8e9a28Af97e5B468131b2484C4156C693709"//"0xcaebdebB4D9094729362638931d7C9dB10B4a059"//"0x769039929b2D060588eA5A05e1c2065D4a2d888d"
 const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 let contract
 let erc20Contract
@@ -98,6 +98,8 @@ const connectCeloWallet = async function () {
             let price = p[2][0]
             let sold = p[2][1]
             let numShares = p[2][2]
+            console.log(`Status ${p[5]}`)
+            console.log(`HOuse TOken ${p[6]}`)
             resolve({
               index: i,
               owner: p[0],
@@ -111,7 +113,7 @@ const connectCeloWallet = async function () {
               bedrooms: p[3],
               bathrooms: p[4],
               status: p[5],
-              houseTokenAddress: p[6],
+              houseTokenAddress: p[7],
             })
             })
             _properties.push(_property)
@@ -125,16 +127,6 @@ const connectCeloWallet = async function () {
 //   }
 
 
-
-  function renderProducts() {
-    document.getElementById("marketplace").innerHTML = ""
-    products.forEach((_product) => {
-      const newDiv = document.createElement("div")
-      newDiv.className = "col-md-4"
-      newDiv.innerHTML = productTemplate(_product)
-      document.getElementById("marketplace").appendChild(newDiv)
-    })
-  }
 
 
 
@@ -151,7 +143,7 @@ const connectCeloWallet = async function () {
 
   function propertiesTemplate(_product) {
     let viewerIsOwner = _product.owner==defaultAccount
-    if (viewerIsOwner){
+    
       return `
       <div class="card mb-4">
         <img class="card-img-top" src="${_product.image}" alt="...">
@@ -182,17 +174,17 @@ const connectCeloWallet = async function () {
           <span>${_product.location}</span>
         </p>
         <div class="d-grid gap-2">
-          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" style="${_product.status!=0?'display:none':'display:block'}" id=${
             _product.index
           }>
             Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
           </a>
-          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" id=${
+          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
             _product.index
           }>
             Update Price
           </a>
-          <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3" id=${
+          <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3"  style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
             _product.index
           }>
             Cancel Sale
@@ -200,46 +192,7 @@ const connectCeloWallet = async function () {
         </div>
       </div>
     </div>`
-    }
-    //Not property owner so do not show cancel or update price
-    return `
-    <div class="card mb-4">
-    <img class="card-img-top" src="${_product.image}" alt="...">
-    <div class="position-absolute top-0 end-0 bg-warning mt-1 px-2 py-1 rounded-start">
-      ${_product.sold} Sold
-    </div>
-    <div class="position-absolute top-0 end-0 bg-warning mt-5 px-2 py-1 rounded-start">
-      ${_product.numShares} Shares
-    </div>
-    <div class="card-body text-left p-4 position-relative">
-    <div class="translate-middle-y position-absolute top-0">
-    ${identiconTemplate(_product.owner)}
-    </div>
-    <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
-    <p class="card-text mb-4" style="min-height: 82px">
-      ${_product.description}             
-    </p>
-    <p class="card-text mt-4">
-      <i class="bi bi-door-open"></i>
-      <span>${_product.bedrooms} Bedrooms</span>
-    </p>
-    <p class="card-text mt-4">
-      <i class="bi bi-door-closed"></i>
-      <span>${_product.bathrooms} Bathrooms</span>
-    </p>
-    <p class="card-text mt-4">
-      <i class="bi bi-geo-alt-fill"></i>
-      <span>${_product.location}</span>
-    </p>
-    <div class="d-grid gap-2">
-      <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
-        _product.index
-      }>
-        Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
-      </a>
-    </div>
-  </div>
-</div>`
+    
 }
 
 function identiconTemplate(_address) {
@@ -363,5 +316,38 @@ function identiconTemplate(_address) {
       notification(`⚠️ ${error}.`)
     }
   }
+})
+
+
+/* Cancel Sale */
+document.querySelector("#marketplace").addEventListener("click", async (e) => {
+  if (e.target.className.includes("cancelSaleBtn")) {
+    console.log('cancelling sale')
+    const index = e.target.id
+    try{
+      let canBeCancelled =  await contract.methods.canBeCancelled(index).call()
+      
+      if (canBeCancelled){
+        notification(`canelling Sale`)
+
+        const result = await contract.methods
+          .cancelPropertySale(index)
+          .send({ from: defaultAccount })
+        notification(`🎉 You successfully cancelled "${properties[index].name}".`)
+        getProperties()
+        getBalance()
+        return
+      }else{
+        notification(`You cannot cancel this sale.`)
+
+      }
+    } catch (error) {
+      notification(`⚠️ ${error}.`)
+    }
+    
+
+
+    
+}
 })
 
