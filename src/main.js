@@ -14,6 +14,7 @@ let contract
 let erc20Contract
 let products = []
 let properties = []
+let viewerIsOwner = false
 let web3 
 let defaultAccount
 let celoTestnetChainId=44787
@@ -132,77 +133,7 @@ const connectCeloWallet = async function () {
     })
   }
 
-  function productTemplate(_product) {
-    let viewerIsOwner = true
-    if (viewerIsOwner){
-      return `
-      <div class="card mb-4">
-        <img class="card-img-top" src="${_product.image}" alt="...">
-        <div class="position-absolute top-0 end-0 bg-warning mt-4 px-2 py-1 rounded-start">
-          ${_product.sold} Sold
-        </div>
-        <div class="card-body text-left p-4 position-relative">
-        <div class="translate-middle-y position-absolute top-0">
-        ${identiconTemplate(_product.owner)}
-        </div>
-        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
-        <p class="card-text mb-4" style="min-height: 82px">
-          ${_product.description}             
-        </p>
-        <p class="card-text mt-4">
-          <i class="bi bi-geo-alt-fill"></i>
-          <span>${_product.location}</span>
-        </p>
-        <div class="d-grid gap-2">
-          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
-            _product.index
-          }>
-            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
-          </a>
-          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" id=${
-            _product.index
-          }>
-            Update Price
-          </a>
-          <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3" id=${
-            _product.index
-          }>
-            Cancel Sale
-          </a>
-        </div>
-      </div>
-    </div>`
-    }
-    
-    return `
-      <div class="card mb-4">
-        <img class="card-img-top" src="${_product.image}" alt="...">
-        <div class="position-absolute top-0 end-0 bg-warning mt-4 px-2 py-1 rounded-start">
-          ${_product.sold} Sold
-        </div>
-        <div class="card-body text-left p-4 position-relative">
-        <div class="translate-middle-y position-absolute top-0">
-        ${identiconTemplate(_product.owner)}
-        </div>
-        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
-        <p class="card-text mb-4" style="min-height: 82px">
-          ${_product.description}             
-        </p>
-        <p class="card-text mt-4">
-          <i class="bi bi-geo-alt-fill"></i>
-          <span>${_product.location}</span>
-        </p>
-        <div class="d-grid gap-2">
-          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
-            _product.index
-          }>
-            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
-          </a>
-        </div>
-      </div>
-    </div>
-  `
-}
+
 
   function renderProperties() {
     document.getElementById("marketplace").innerHTML = ""
@@ -216,7 +147,7 @@ const connectCeloWallet = async function () {
 
 
   function propertiesTemplate(_product) {
-    let viewerIsOwner = true
+    let viewerIsOwner = _product.owner==defaultAccount
     if (viewerIsOwner){
       return `
       <div class="card mb-4">
@@ -251,7 +182,7 @@ const connectCeloWallet = async function () {
           <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
             _product.index
           }>
-            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
+            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
           </a>
           <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" id=${
             _product.index
@@ -267,35 +198,45 @@ const connectCeloWallet = async function () {
       </div>
     </div>`
     }
-    
+    //Not property owner so do not show cancel or update price
     return `
-      <div class="card mb-4">
-        <img class="card-img-top" src="${_product.image}" alt="...">
-        <div class="position-absolute top-0 end-0 bg-warning mt-4 px-2 py-1 rounded-start">
-          ${_product.sold} Sold
-        </div>
-        <div class="card-body text-left p-4 position-relative">
-        <div class="translate-middle-y position-absolute top-0">
-        ${identiconTemplate(_product.owner)}
-        </div>
-        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
-        <p class="card-text mb-4" style="min-height: 82px">
-          ${_product.description}             
-        </p>
-        <p class="card-text mt-4">
-          <i class="bi bi-geo-alt-fill"></i>
-          <span>${_product.location}</span>
-        </p>
-        <div class="d-grid gap-2">
-          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
-            _product.index
-          }>
-            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')).toFixed(2)} cUSD
-          </a>
-        </div>
-      </div>
+    <div class="card mb-4">
+    <img class="card-img-top" src="${_product.image}" alt="...">
+    <div class="position-absolute top-0 end-0 bg-warning mt-1 px-2 py-1 rounded-start">
+      ${_product.sold} Sold
     </div>
-  `
+    <div class="position-absolute top-0 end-0 bg-warning mt-5 px-2 py-1 rounded-start">
+      ${_product.numShares} Shares
+    </div>
+    <div class="card-body text-left p-4 position-relative">
+    <div class="translate-middle-y position-absolute top-0">
+    ${identiconTemplate(_product.owner)}
+    </div>
+    <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
+    <p class="card-text mb-4" style="min-height: 82px">
+      ${_product.description}             
+    </p>
+    <p class="card-text mt-4">
+      <i class="bi bi-door-open"></i>
+      <span>${_product.bedrooms} Bedrooms</span>
+    </p>
+    <p class="card-text mt-4">
+      <i class="bi bi-door-closed"></i>
+      <span>${_product.bathrooms} Bathrooms</span>
+    </p>
+    <p class="card-text mt-4">
+      <i class="bi bi-geo-alt-fill"></i>
+      <span>${_product.location}</span>
+    </p>
+    <div class="d-grid gap-2">
+      <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" id=${
+        _product.index
+      }>
+        Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
+      </a>
+    </div>
+  </div>
+</div>`
 }
 
 function identiconTemplate(_address) {
