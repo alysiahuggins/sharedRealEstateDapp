@@ -193,7 +193,7 @@ const connectCeloWallet = async function () {
             Update Property
           </a>
           
-          <a class="btn btn-lg btn-outline-dark houseTokenBtn fs-6 p-3" href= "${celoExplorer}address/${_property.houseTokenAddress}" target="_blank" id=${
+          <a class="btn btn-lg btn-outline-dark houseTokenBtn fs-6 p-3" href= "${celoExplorer}token/${_property.houseTokenAddress}/token-transfers" target="_blank" id=${
             _property.index} style="${_property.status!=0?'display:none':'display:block'}"
           >
             House Token

@@ -22,6 +22,11 @@ This is a shared real-estate marketplace dapp where users can:
 - Added more characteristics such as number of bedrooms, bathrooms etc
 - Added link to ERC20 House Token for each property 
 
+
+## TODO
+- only approve tokens when there is no allowance
+- Allow property owner to update the number of shares on sale and thus transfer the right number of tokens 
+
 ## Live Demo
 [Marketplace Dapp](https://alysiahuggins.github.io/dacade-celo-dapp-101-demo/)
 
@@ -43,7 +48,8 @@ This is a shared real-estate marketplace dapp where users can:
 7. Update the price of a property that you own.
 8. Cancel the sale of a property you own that haven't had any sales yet
 
-
+### An Example of House Token and its transfers after each sale
+![](img/HouseTokenExample.png)
 
 ## Project Setup
 
