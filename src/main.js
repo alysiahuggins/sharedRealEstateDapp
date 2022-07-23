@@ -4,7 +4,7 @@ import BigNumber from "bignumber.js"
 import marketplaceAbi from '../contract/propertyMarketplace.abi.json'
 import erc20Abi from '../contract/erc20.abi.json'
 
-/** TODO
+/** TODOg
  * update shares button
  * show how many shares the user has
  */
@@ -104,8 +104,6 @@ const connectCeloWallet = async function () {
             let price = p[2][0]
             let sold = p[2][1]
             let numShares = p[2][2]
-            console.log(`Status ${p[5]}`)
-            console.log(`HOuse TOken ${p[6]}`)
             resolve({
               index: i,
               owner: p[0],
@@ -191,20 +189,16 @@ const connectCeloWallet = async function () {
             Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
           </a>
 
-          <!-- only show update price and cancel buttons if current viewer is the owner-->
-          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
+          <!-- only show update price and cancel buttons if current viewer is the owner and there are no properties sold-->
+          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_product.status!=0||viewerIsOwner!=true||_product.sold>0?'display:none':'display:block'}" id=${
             _product.index
           }
               data-bs-toggle="modal"
               data-bs-target="#updatePriceModal-${
                 _product.index}">
-            Update Price
+            Update Property
           </a>
-          <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3"  style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
-            _product.index
-          }>
-            Cancel Sale
-          </a>
+          
           <a class="btn btn-lg btn-outline-dark houseTokenBtn fs-6 p-3" href= "${celoExplorer}address/${_product.houseTokenAddress}" target="_blank" id=${
             _product.index} style="${_product.status!=0?'display:none':'display:block'}"
           >
@@ -250,15 +244,6 @@ const connectCeloWallet = async function () {
                     </div>
                   </div>
                 </form>
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-light border"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
                 <button
                   type="button"
                   class="btn btn-dark"
@@ -268,9 +253,32 @@ const connectCeloWallet = async function () {
                 >
                   Update Property Price
                 </button>
+            
+              </div>
+
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-light border"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+
+                <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3" data-bs-dismiss="modal"  id=${
+                  _product.index
+                }>
+                  Cancel Sale
+                </a>
+                
               </div>
             </div>
+            
           </div>
+
+          
+
+          
         </div>
         <!--/Modal-->`
     
