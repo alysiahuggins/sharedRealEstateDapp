@@ -9,6 +9,8 @@ This is a shared real-estate marketplace dapp where users can:
 - anyone can buy a share
 - only owners would see the update property button so that they can update the property details.
 
+The novelty here is the fact that when you uplaod your property for sale, ERC20 tokens that represent that house is automatically created and transferred to persons who purchase a piece of your property. 
+
 ## Smart Contract Functionality Added
 - Create an ERC20 token for each property added
 - Transfer those adequate number ERC20 tokens to the person who bought a share of the property
@@ -26,6 +28,7 @@ This is a shared real-estate marketplace dapp where users can:
 ## TODO
 - only approve tokens when there is no allowance
 - Allow property owner to update the number of shares on sale and thus transfer the right number of tokens 
+- NFTs to represent the homes instead of ERC20 tokens
 
 ## Live Demo
 [Marketplace Dapp](https://alysiahuggins.github.io/dacade-celo-dapp-101-demo/)
