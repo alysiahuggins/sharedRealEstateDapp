@@ -31,7 +31,7 @@ The novelty here is the fact that when you uplaod your property for sale, ERC20 
 - NFTs to represent the homes instead of ERC20 tokens
 
 ## Live Demo
-[Marketplace Dapp](https://alysiahuggins.github.io/dacade-celo-dapp-101-demo/)
+[Marketplace Dapp](https://alysiahuggins.github.io/sharedRealEstateDapp/)
 
 ## Usage
 
