@@ -46,23 +46,28 @@
       <body>
         <div class="container mt-2" style="max-width: 72em">
     
-          <nav class="navbar bg-white navbar-light">
+          <nav class="navbar navbar-light" style="background-color: #edc0e0;">
             <div class="container-fluid">
-              <span class="navbar-brand m-0 h4 fw-bold">Shared Real Estate</span>
+              <span class="navbar-brand m-0 h4 fw-bold ">Shared Real Estate</span>
               <span class="nav-link border rounded-pill bg-light">
                 <span id="balance">0</span>
-                cUSD222
+                cUSD
               </span>
             </div>
           </nav>
+          <br>
+          <div class="text-center" role="">
+            <h5 class="card-title">Buy a piece of a property 🏠 and receive a tokens 🪙 that represent your share. You can trade those tokens with anyone.</h5>
+          </div>
           <div class="alert alert-warning sticky-top mt-2" role="alert">
             <span id="notification">⌛ Loading...</span>
           </div>
           <div class="mb-4" style="margin-top: 4em">
             <a
-              class="btn btn-dark rounded-pill"
+              class="btn rounded-pill"
               data-bs-toggle="modal"
               data-bs-target="#addModal"
+              style="background-color: #edc0e0;"
             >
               Add property
             </a>
@@ -74,14 +79,14 @@
         class="modal fade"
         id="addModal"
         tabindex="-1"
-        aria-labelledby="newProductModalLabel"
+        aria-labelledby="newPropertyModalLabel"
         aria-hidden="true"
         >
         <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-header">
-            <h5 class="modal-title" id="newProductModalLabel">New Property</h5>
+            <h5 class="modal-title" id="newPropertyModalLabel">New Property</h5>
             <button
                 type="button"
                 class="btn-close"
@@ -95,9 +100,9 @@
                     <div class="col">
                       <input
                         type="text"
-                        id="newProductName"
+                        id="newPropertyName"
                         class="form-control mb-2"
-                        placeholder="Enter name of product"
+                        placeholder="Enter name of property"
                       />
                     </div>
                     <div class="col">
@@ -111,9 +116,9 @@
                     <div class="col">
                       <input
                         type="text"
-                        id="newProductDescription"
+                        id="newPropertyDescription"
                         class="form-control mb-2"
-                        placeholder="Enter product description"
+                        placeholder="Enter property description"
                       />
                     </div>
                     <div class="col">
@@ -124,12 +129,37 @@
                         placeholder="Enter location"
                       />
                     </div>
+                    
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="numBedrooms"
+                        class="form-control mb-2"
+                        placeholder="Enter number of bedrooms"
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="numBathrooms"
+                        class="form-control mb-2"
+                        placeholder="Enter number of bedrooms"
+                      />
+                    </div>
                     <div class="col">
                       <input
                         type="text"
                         id="newPrice"
                         class="form-control mb-2"
-                        placeholder="Enter price"
+                        placeholder="Enter property price"
+                      />
+                    </div>
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="numShares"
+                        class="form-control mb-2"
+                        placeholder="Enter max number of house token owners"
                       />
                     </div>
                   </div>
@@ -147,7 +177,7 @@
                   type="button"
                   class="btn btn-dark"
                   data-bs-dismiss="modal"
-                  id="newProductBtn"
+                  id="newPropertyBtn"
                 >
                   Add property
                 </button>
@@ -156,6 +186,8 @@
           </div>
         </div>
         <!--/Modal-->
+
+        
         <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
@@ -164,3 +196,6 @@
         <script src="https://unpkg.com/ethereum-blockies@0.1.1/blockies.min.js"></script>
       <script type="text/javascript" src="main.js"></script></body>
     </html>
+
+
+    
