@@ -4,6 +4,11 @@ import BigNumber from "bignumber.js"
 import marketplaceAbi from '../contract/propertyMarketplace.abi.json'
 import erc20Abi from '../contract/erc20.abi.json'
 
+/** TODO
+ * updatePRice button
+ * update shares button
+ * show how many shares the user has
+ */
 
 const ERC20_DECIMALS = 18
 
@@ -18,6 +23,7 @@ let viewerIsOwner = false
 let web3 
 let defaultAccount
 let celoTestnetChainId=44787
+let celoExplorer = "https://alfajores-blockscout.celo-testnet.org/"
 
 
 
@@ -114,7 +120,7 @@ const connectCeloWallet = async function () {
               bedrooms: p[3],
               bathrooms: p[4],
               status: p[5],
-              houseTokenAddress: p[7],
+              houseTokenAddress: p[6],
             })
             })
             _properties.push(_property)
@@ -179,11 +185,14 @@ const connectCeloWallet = async function () {
           <span>${_product.status==0?'On Sale':_product.status==1?'Sale Cancelled':'Sold Out'}</span>
         </p>
         <div class="d-grid gap-2">
+          <!-- do not show buy button if product status is not 0 (which means on sale)-->
           <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" style="${_product.status!=0?'display:none':'display:block'}" id=${
             _product.index
           }>
             Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
           </a>
+
+          <!-- only show update price and cancel buttons if current viewer is the owner-->
           <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
             _product.index
           }>
@@ -193,6 +202,11 @@ const connectCeloWallet = async function () {
             _product.index
           }>
             Cancel Sale
+          </a>
+          <a class="btn btn-lg btn-outline-dark houseTokenBtn fs-6 p-3" href= "${celoExplorer}address/${_product.houseTokenAddress}" target="_blank" id=${
+            _product.index} style="${_product.status!=0?'display:none':'display:block'}"
+          >
+            House Token
           </a>
         </div>
       </div>
