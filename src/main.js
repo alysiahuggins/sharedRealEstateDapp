@@ -5,7 +5,6 @@ import marketplaceAbi from '../contract/propertyMarketplace.abi.json'
 import erc20Abi from '../contract/erc20.abi.json'
 
 /** TODO
- * updatePRice button
  * update shares button
  * show how many shares the user has
  */
@@ -78,7 +77,7 @@ const connectCeloWallet = async function () {
   
         contract = new kit.web3.eth.Contract(marketplaceAbi, MPContractAddress)
       } catch (error) {
-        notification(`⚠️ ${error}.`)
+        notification(`⚠️ ${error.message}.`)
       }
     } else {
       notification("⚠️ Please install the CeloExtensionWallet.")
@@ -195,7 +194,10 @@ const connectCeloWallet = async function () {
           <!-- only show update price and cancel buttons if current viewer is the owner-->
           <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
             _product.index
-          }>
+          }
+              data-bs-toggle="modal"
+              data-bs-target="#updatePriceModal-${
+                _product.index}">
             Update Price
           </a>
           <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3"  style="${_product.status!=0||viewerIsOwner!=true?'display:none':'display:block'}" id=${
@@ -210,7 +212,67 @@ const connectCeloWallet = async function () {
           </a>
         </div>
       </div>
-    </div>`
+    </div>
+    
+    
+    <!--Modal-->
+        <div
+        class="modal fade"
+        id="updatePriceModal-${
+          _product.index}"
+        tabindex="-1"
+        aria-labelledby="updatePriceModalLabel"
+        aria-hidden="true"
+        >
+        <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+            <h5 class="modal-title" id="updatePriceModalLabel">New Property</h5>
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+            ></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                  <div class="form-row">
+                    <div class="col">
+                      <input
+                        type="number"
+                        id="updatePrice-${
+                          _product.index}"
+                        class="form-control mb-2"
+                        placeholder="Enter updated property price"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-light border"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-dark"
+                  data-bs-dismiss="modal"
+                  id="updatePriceModalBtn-${
+                    _product.index}"
+                >
+                  Update Property Price
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--/Modal-->`
     
 }
 
@@ -311,7 +373,7 @@ function identiconTemplate(_address) {
           return
         }
       } catch (error) {
-        notification(`⚠️ ${error}.`)
+        notification(`⚠️ ${error.message}.`)
       }
       
 
@@ -332,7 +394,7 @@ function identiconTemplate(_address) {
       getProperties()
       getBalance()
     } catch (error) {
-      notification(`⚠️ ${error}.`)
+      notification(`⚠️ ${error.message}.`)
     }
   }
 })
@@ -361,12 +423,38 @@ document.querySelector("#marketplace").addEventListener("click", async (e) => {
 
       }
     } catch (error) {
-      notification(`⚠️ ${error}.`)
-    }
-    
-
-
-    
+      notification(`⚠️ ${error.message}.`)
+    } 
 }
+})
+
+
+/* Update Price Button */
+document.querySelector("#marketplace").addEventListener("click", async (e) => {
+  if (e.target.id.includes("updatePriceModalBtn")) {
+    console.log('updating price')
+    const index = e.target.id.split('-')[1]
+    const price = web3.utils.toWei( document.getElementById(`updatePrice-${index}`).value)
+    try{
+      let canBeCancelled =  await contract.methods.canBeCancelled(index).call()
+      
+      if (canBeCancelled){
+        notification(`Updating Sale Price`)
+
+        const result = await contract.methods
+          .updatePropertyPrice(index, price)
+          .send({ from: defaultAccount })
+        notification(`🎉 You successfully updated the price of "${properties[index].name}".`)
+        getProperties()
+        getBalance()
+        return
+      }else{
+        notification(`You cannot update this property price.`)
+
+      }
+    } catch (error) {
+      notification(`⚠️ ${error.message}.`)
+    } 
+  }
 })
 
