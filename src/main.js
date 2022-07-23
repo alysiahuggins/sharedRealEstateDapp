@@ -160,6 +160,10 @@ const connectCeloWallet = async function () {
           ${_property.description}             
         </p>
         <p class="card-text mt-4">
+          <i class="bi bi-tag"></i>
+          <span>$${web3.utils.fromWei(_property.price.toString(), 'ether')}</span>
+        </p>
+        <p class="card-text mt-4">
           <i class="bi bi-door-open"></i>
           <span>${_property.bedrooms} Bedrooms</span>
         </p>
