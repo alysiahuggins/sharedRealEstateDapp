@@ -59,6 +59,9 @@ contract PropertyMarketplace {
 
     mapping (uint => Property) internal properties;
 
+ 
+
+
     function writeProperty(
         PropertyLabel memory _label, 
         PropertyStockData memory _stockData,
@@ -68,6 +71,7 @@ contract PropertyMarketplace {
         uint _sold = 0;
         _stockData.sold = _sold;
         
+        //create a house token - there will be as many tokens as there are shares to be sold
         HouseToken _houseToken = new HouseToken(_label.name, "HTK", _stockData.numShares, address(this));
 
         properties[propertiesLength] = Property(
@@ -110,7 +114,7 @@ contract PropertyMarketplace {
     returns (uint){
         return propertiesLength;
     }
-    
+
     function getAllowance(address spender, uint _index)
     public
     view
@@ -167,6 +171,43 @@ contract PropertyMarketplace {
 
     }
 
+    function canBeCancelled(uint _index)
+    public
+    view
+    returns(bool)
+    {
+        return (
+            msg.sender==properties[_index].owner ||
+            properties[_index].stockData.sold==0 ||
+            properties[_index].status!=Status.SaleCancelled 
+        );
+    }
+
+    function canUpdatePrice(uint _index)
+    public
+    view
+    returns(bool)
+    {
+        return (
+            msg.sender==properties[_index].owner ||
+            properties[_index].stockData.sold==0 ||
+            properties[_index].status!=Status.SaleCancelled 
+        );
+    }
+
+    function canUpdateShares(uint _index)
+    public
+    view
+    returns(bool)
+    {
+        return (
+            msg.sender==properties[_index].owner ||
+            properties[_index].stockData.sold==0 ||
+            properties[_index].status!=Status.SaleCancelled 
+        );
+    }
+
+
     function updatePropertyPrice(uint _index, uint _price)
     public
     {
@@ -182,6 +223,15 @@ contract PropertyMarketplace {
         require(msg.sender==properties[_index].owner, "Only the property owner can cancel the sale");
         require(properties[_index].stockData.sold==0, "The sale cannot be cancelled if some tokens are already issued");
         properties[_index].status = Status.SaleCancelled;
+    }
+
+    function updatePropertyShares(uint _index, uint _shares)
+    public
+    {
+        require(msg.sender==properties[_index].owner, "Only the property owner can cancel the sale");
+        require(properties[_index].stockData.sold==0, "The sale cannot be updated if some tokens are already issued");
+        require(properties[_index].status!=Status.SaleCancelled, "The property sale is cancelled");
+        properties[_index].stockData.numShares = _shares;
     }
     
     function buyProperty(uint _index) public payable  {

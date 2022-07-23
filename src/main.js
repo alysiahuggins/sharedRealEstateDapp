@@ -12,7 +12,7 @@ import erc20Abi from '../contract/erc20.abi.json'
 const ERC20_DECIMALS = 18
 
 let kit
-const MPContractAddress = "0xB73B63278fdbaB9a12Aa10C9791Bed0C8edb50CD"//"0x3E9B8e9a28Af97e5B468131b2484C4156C693709"//"0xcaebdebB4D9094729362638931d7C9dB10B4a059"//"0x769039929b2D060588eA5A05e1c2065D4a2d888d"
+const MPContractAddress = "0x634cED1A66D18744D44716A741284118B687b061"
 const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 let contract
 let erc20Contract

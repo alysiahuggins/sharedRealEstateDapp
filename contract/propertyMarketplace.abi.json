@@ -150,19 +150,6 @@
 	},
 	{
 		"inputs": [],
-		"name": "getOnSaleStatusCode",
-		"outputs": [
-			{
-				"internalType": "enum PropertyMarketplace.Status",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
 		"name": "getPropertiesLength",
 		"outputs": [
 			{
@@ -245,32 +232,6 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getSaleCancelledStatusCode",
-		"outputs": [
-			{
-				"internalType": "enum PropertyMarketplace.Status",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getSoldOutStatusCode",
-		"outputs": [
-			{
-				"internalType": "enum PropertyMarketplace.Status",
-				"name": "",
-				"type": "uint8"
 			}
 		],
 		"stateMutability": "view",
