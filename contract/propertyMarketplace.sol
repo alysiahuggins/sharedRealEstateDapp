@@ -124,7 +124,7 @@ contract PropertyMarketplace {
             _stockData.numShares,
             address(this)
         );
-
+        exists[propertiesLength] = true;
         properties[propertiesLength] = Property(
             payable(msg.sender),
             _label,
