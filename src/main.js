@@ -16,18 +16,16 @@ const MPContractAddress = "0xB73B63278fdbaB9a12Aa10C9791Bed0C8edb50CD"//"0x3E9B8
 const cUSDTokenAddress = "0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1"
 let contract
 let erc20Contract
-let products = []
 let properties = []
-let viewerIsOwner = false
 let web3 
 let defaultAccount
 let celoTestnetChainId=44787
 let celoExplorer = "https://alfajores-blockscout.celo-testnet.org/"
-
+let bgColor = "#edc0e0"
 
 
 // ["Best House","https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/08/download-23.jpg","Best house on the block","London, UK"]
-// [300000000000000000000000,0,10]
+// [300000000000000000000000,0,1000000]
 
 
 ethereum.on('chainChanged', (_chainId) => window.location.reload());
@@ -126,10 +124,6 @@ const connectCeloWallet = async function () {
         renderProperties()
       }
 
-//   const getBalance = function () {
-//     document.querySelector("#balance").textContent = 21
-//   }
-
 
 
 
@@ -145,62 +139,62 @@ const connectCeloWallet = async function () {
   }
 
 
-  function propertiesTemplate(_product) {
-    let viewerIsOwner = _product.owner==defaultAccount
+  function propertiesTemplate(_property) {
+    let viewerIsOwner = _property.owner==defaultAccount
     
       return `
       <div class="card mb-4">
-        <img class="card-img-top" src="${_product.image}" alt="...">
-        <div class="position-absolute top-0 end-0 bg-warning mt-1 px-2 py-1 rounded-start">
-          ${_product.sold} Sold
+        <img class="card-img-top" src="${_property.image}" alt="...">
+        <div class="position-absolute top-0 end-0 mt-1 px-2 py-1 rounded-start" style="background-color: ${bgColor};">
+          ${_property.sold} Sold
         </div>
-        <div class="position-absolute top-0 end-0 bg-warning mt-5 px-2 py-1 rounded-start">
-          ${_product.numShares} Shares
+        <div class="position-absolute top-0 end-0 mt-5 px-2 py-1 rounded-start" style="background-color: ${bgColor};">
+          ${_property.numShares} Shares
         </div>
         <div class="card-body text-left p-4 position-relative">
         <div class="translate-middle-y position-absolute top-0">
-        ${identiconTemplate(_product.owner)}
+        ${identiconTemplate(_property.owner)}
         </div>
-        <h2 class="card-title fs-4 fw-bold mt-2">${_product.name}</h2>
+        <h2 class="card-title fs-4 fw-bold mt-2">${_property.name}</h2>
         <p class="card-text mb-4" style="min-height: 82px">
-          ${_product.description}             
+          ${_property.description}             
         </p>
         <p class="card-text mt-4">
           <i class="bi bi-door-open"></i>
-          <span>${_product.bedrooms} Bedrooms</span>
+          <span>${_property.bedrooms} Bedrooms</span>
         </p>
         <p class="card-text mt-4">
           <i class="bi bi-door-closed"></i>
-          <span>${_product.bathrooms} Bathrooms</span>
+          <span>${_property.bathrooms} Bathrooms</span>
         </p>
         <p class="card-text mt-4">
           <i class="bi bi-geo-alt-fill"></i>
-          <span>${_product.location}</span>
+          <span>${_property.location}</span>
         </p>
         <p class="card-text mt-4 ">
           <i class="bi bi-megaphone-fill" ></i>
-          <span>${_product.status==0?'On Sale':_product.status==1?'Sale Cancelled':'Sold Out'}</span>
+          <span>${_property.status==0?'On Sale':_property.status==1?'Sale Cancelled':'Sold Out'}</span>
         </p>
         <div class="d-grid gap-2">
-          <!-- do not show buy button if product status is not 0 (which means on sale)-->
-          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" style="${_product.status!=0?'display:none':'display:block'}" id=${
-            _product.index
+          <!-- do not show buy button if property status is not 0 (which means on sale)-->
+          <a class="btn btn-lg btn-outline-dark buyBtn fs-6 p-3" style="${_property.status!=0?'display:none':'display:block'}" id=${
+            _property.index
           }>
-            Buy for ${parseFloat(web3.utils.fromWei(_product.price.toString(), 'ether')/_product.numShares).toFixed(2)} cUSD per share
+            Buy for ${parseFloat(web3.utils.fromWei(_property.price.toString(), 'ether')/_property.numShares).toFixed(2)} cUSD per share
           </a>
 
           <!-- only show update price and cancel buttons if current viewer is the owner and there are no properties sold-->
-          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_product.status!=0||viewerIsOwner!=true||_product.sold>0?'display:none':'display:block'}" id=${
-            _product.index
+          <a class="btn btn-lg btn-outline-dark updatePriceBtn fs-6 p-3" style="${_property.status!=0||viewerIsOwner!=true||_property.sold>0?'display:none':'display:block'}" id=${
+            _property.index
           }
               data-bs-toggle="modal"
               data-bs-target="#updatePriceModal-${
-                _product.index}">
+                _property.index}">
             Update Property
           </a>
           
-          <a class="btn btn-lg btn-outline-dark houseTokenBtn fs-6 p-3" href= "${celoExplorer}address/${_product.houseTokenAddress}" target="_blank" id=${
-            _product.index} style="${_product.status!=0?'display:none':'display:block'}"
+          <a class="btn btn-lg btn-outline-dark houseTokenBtn fs-6 p-3" href= "${celoExplorer}address/${_property.houseTokenAddress}" target="_blank" id=${
+            _property.index} style="${_property.status!=0?'display:none':'display:block'}"
           >
             House Token
           </a>
@@ -213,7 +207,7 @@ const connectCeloWallet = async function () {
         <div
         class="modal fade"
         id="updatePriceModal-${
-          _product.index}"
+          _property.index}"
         tabindex="-1"
         aria-labelledby="updatePriceModalLabel"
         aria-hidden="true"
@@ -237,7 +231,7 @@ const connectCeloWallet = async function () {
                       <input
                         type="number"
                         id="updatePrice-${
-                          _product.index}"
+                          _property.index}"
                         class="form-control mb-2"
                         placeholder="Enter updated property price"
                       />
@@ -249,7 +243,7 @@ const connectCeloWallet = async function () {
                   class="btn btn-dark"
                   data-bs-dismiss="modal"
                   id="updatePriceModalBtn-${
-                    _product.index}"
+                    _property.index}"
                 >
                   Update Property Price
                 </button>
@@ -266,7 +260,7 @@ const connectCeloWallet = async function () {
                 </button>
 
                 <a class="btn btn-lg btn-outline-dark cancelSaleBtn fs-6 p-3" data-bs-dismiss="modal"  id=${
-                  _product.index
+                  _property.index
                 }>
                   Cancel Sale
                 </a>
@@ -314,14 +308,13 @@ function identiconTemplate(_address) {
 
   window.addEventListener('load', async () => {
     notification("⌛ Loading...")
-    // await connectCeloWallet()
     await connectMetamaskWallet()
     await getBalance()
     await getProperties()
     notificationOff()
   });
 
-  //adding the product
+  /* Add Property button */
   document
   .querySelector("#newPropertyBtn")
   .addEventListener("click", async (e) => {
@@ -358,7 +351,7 @@ function identiconTemplate(_address) {
 
  
   
-
+  /* Approve token spender */
   async function approve(_price) {
     const cUSDContract = new web3.eth.Contract(erc20Abi, cUSDTokenAddress)
     console.log("toApprove")
@@ -370,6 +363,7 @@ function identiconTemplate(_address) {
     return result
   }
 
+  /* Buy Property Button */
   document.querySelector("#marketplace").addEventListener("click", async (e) => {
     if (e.target.className.includes("buyBtn")) {
       const index = e.target.id

@@ -46,23 +46,28 @@
       <body>
         <div class="container mt-2" style="max-width: 72em">
     
-          <nav class="navbar bg-white navbar-light">
+          <nav class="navbar navbar-light" style="background-color: #edc0e0;">
             <div class="container-fluid">
-              <span class="navbar-brand m-0 h4 fw-bold">Shared Real Estate</span>
+              <span class="navbar-brand m-0 h4 fw-bold ">Shared Real Estate</span>
               <span class="nav-link border rounded-pill bg-light">
                 <span id="balance">0</span>
                 cUSD
               </span>
             </div>
           </nav>
+          <br>
+          <div class="text-center" role="">
+            <h5 class="card-title">Buy a piece of a property 🏠 and receive a tokens 🪙 that represents your share. You can trade those tokens on the open market.</h5>
+          </div>
           <div class="alert alert-warning sticky-top mt-2" role="alert">
             <span id="notification">⌛ Loading...</span>
           </div>
           <div class="mb-4" style="margin-top: 4em">
             <a
-              class="btn btn-dark rounded-pill"
+              class="btn rounded-pill"
               data-bs-toggle="modal"
               data-bs-target="#addModal"
+              style="background-color: #edc0e0;"
             >
               Add property
             </a>
@@ -74,14 +79,14 @@
         class="modal fade"
         id="addModal"
         tabindex="-1"
-        aria-labelledby="newProductModalLabel"
+        aria-labelledby="newPropertyModalLabel"
         aria-hidden="true"
         >
         <div class="modal-dialog">
         <div class="modal-content">
 
             <div class="modal-header">
-            <h5 class="modal-title" id="newProductModalLabel">New Property</h5>
+            <h5 class="modal-title" id="newPropertyModalLabel">New Property</h5>
             <button
                 type="button"
                 class="btn-close"
